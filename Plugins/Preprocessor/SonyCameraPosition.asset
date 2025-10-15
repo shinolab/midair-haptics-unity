@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b6e33a98eaf06a41a9d62d67905aa88, type: 3}
+  m_Name: SonyCameraPosition
+  m_EditorClassIdentifier: 
+  cameras:
+  - serialNumber: 151322066536
+    position: {x: 1.2079899, y: 0.271141, z: -1.5510299}
+    rotation: {x: -0.4091041, y: -0.008558664, z: -0.005382585, w: 0.9124317}
+    imageWidth: 640
+    imageHeight: 360
+    preset: Realsense/cameraPreset/preset.json
+  - serialNumber: 839112060033
+    position: {x: 1.13578, y: 0.22643602, z: 1.4449201}
+    rotation: {x: 0.89948595, y: 0.0034319113, z: -0.004326349, w: -0.4369149}
+    imageWidth: 640
+    imageHeight: 360
+    preset: Realsense/cameraPreset/preset.json
+  - serialNumber: 104122060486
+    position: {x: 3.9737701, y: 3.9163198, z: -0.216533}
+    rotation: {x: 0.677962, y: 0.20769466, z: -0.6746446, w: 0.20514669}
+    imageWidth: 640
+    imageHeight: 360
+    preset: Realsense/cameraPreset/preset.json
+  - serialNumber: 017122060140
+    position: {x: -2.09535, y: 3.9517, z: -0.295444}
+    rotation: {x: 0.22417581, y: 0.66991276, z: -0.22228624, w: 0.67197543}
+    imageWidth: 640
+    imageHeight: 360
+    preset: Realsense/cameraPreset/preset.json

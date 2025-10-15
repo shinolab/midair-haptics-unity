@@ -1,0 +1,8 @@
+{
+    "name": "com.matsubayashi.haptics",
+    "author": "matsubayashi",
+    "version": "0.1.5",
+    "displayName": "haptics",
+    "description": "haptics",
+    "unity": "2021.3"
+}
