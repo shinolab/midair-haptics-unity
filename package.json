@@ -2,7 +2,7 @@
     "name": "com.matsubayashi.haptics",
     "author": "matsubayashi",
     "version": "0.1.5",
-    "displayName": "haptics",
-    "description": "haptics",
+    "displayName": "MidairHaptics",
+    "description": "MidairHaptics",
     "unity": "2021.3"
 }

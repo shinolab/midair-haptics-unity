@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Obi;
-using UnityEngine.Assertions.Must;
 
 
 public class HaptoObject : MonoBehaviour
