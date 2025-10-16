@@ -50,6 +50,8 @@ public class LoadCameraPosition : MonoBehaviour
 
         foreach (var cp in cameraPositionAsset.cameras)
         {
+            Debug.Log("Load camera position: " + cp.serialNumber);
+            Debug.Log("Position: " + cp.position.ToString("F3") + " Rotation: " + cp.rotation.eulerAngles.ToString("F3"));
             var index = serials.IndexOf(cp.serialNumber);
             if (index < 0)
             {

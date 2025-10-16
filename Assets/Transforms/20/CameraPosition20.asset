@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b6e33a98eaf06a41a9d62d67905aa88, type: 3}
+  m_Name: CameraPosition20
+  m_EditorClassIdentifier: 
+  cameras:
+  - serialNumber: 104122060486
+    position: {x: 3.973015, y: 3.9045703, z: -0.20643121}
+    rotation: {x: 0.68115664, y: 0.2099282, z: -0.6709823, w: 0.20430014}
+    imageWidth: 640
+    imageHeight: 360
+    preset: Realsense/cameraPreset/preset.json
+  - serialNumber: 839112060033
+    position: {x: 1.0856762, y: 0.22523603, z: 1.4371399}
+    rotation: {x: 0.8989043, y: 0.0050926637, z: 0.010469968, w: -0.4379904}
+    imageWidth: 640
+    imageHeight: 360
+    preset: Realsense/cameraPreset/preset.json
+  - serialNumber: 017122060140
+    position: {x: -2.1513362, y: 3.9335167, z: -0.30772865}
+    rotation: {x: 0.22805001, y: 0.67090946, z: -0.2169872, w: 0.6714091}
+    imageWidth: 640
+    imageHeight: 360
+    preset: Realsense/cameraPreset/preset.json
+  - serialNumber: 151322066536
+    position: {x: 1.1763699, y: 0.25967568, z: -1.5560158}
+    rotation: {x: -0.41319132, y: -0.00993153, z: -0.004769078, w: 0.9105776}
+    imageWidth: 640
+    imageHeight: 360
+    preset: Realsense/cameraPreset/preset.json

@@ -1,16 +1,9 @@
 using UnityEngine;
-using System.Collections.Generic;
-using System;
 
-[CreateAssetMenu(fileName = "MultiTransform", menuName = "ScriptableObjects/MultiTransform")]
-public class MultiTransformAsset : ScriptableObject
+[CreateAssetMenu(fileName = "Transform", menuName = "ScriptableObjects/Transform")]
+public class TransformAsset : ScriptableObject
 {
-    public List<Trans> transforms;
-}
-
-[System.Serializable]
-public struct Trans
-{
+    //public Transform transform;
     public Vector3 position;
     public Quaternion rotation;
     public Vector3 scale;
