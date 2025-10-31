@@ -13,6 +13,7 @@ unsafe public class Preprocessor : MonoBehaviour
 {
     [DllImport("dll_preprocessor")] unsafe protected static extern void setBoxRegion(float[] minRegion, float[] maxRegion, bool bTruncate);
     [DllImport("dll_preprocessor")] unsafe protected static extern void setNumGrid(float[] minRegion, float[] maxRegion, int[] numGrid, bool bSampleCellMean);
+    [DllImport("dll_preprocessor")] unsafe protected static extern void setSdf(float[] minRegion, float[] maxRegion, int[] numGrid, float minVal, bool bSdf);
     [DllImport("dll_preprocessor")] unsafe protected static extern void setCamTransMat(float[] matrix,  int numCamera, bool bTransformGlobal);
     [DllImport("dll_preprocessor")] unsafe protected static extern void setParamHSV(float[] paramHSV, bool bColorTrim);
     [DllImport("dll_preprocessor")] unsafe protected static extern void setSizeWindowNormal(int sizeWindow);
@@ -34,6 +35,7 @@ unsafe public class Preprocessor : MonoBehaviour
     [DllImport("dll_preprocessor")] unsafe protected static extern float* getPointerNormalGpu();
     [DllImport("dll_preprocessor")] unsafe protected static extern bool* getPointerValidityGpu();
     [DllImport("dll_preprocessor")] unsafe protected static extern void writePointToBuffer();
+    [DllImport("dll_preprocessor")] unsafe protected static extern int getSdf(float[] sdfdata);
     [DllImport("dll_preprocessor")] unsafe protected static extern void swapBuffer();
 
     public delegate void DebugLogDelegate(string str);
@@ -77,7 +79,15 @@ unsafe public class Preprocessor : MonoBehaviour
     [SerializeField] [HideInInspector] public bool sampleCellMean = true;
     [SerializeField] [HideInInspector] public Vector3Int numGrid = new Vector3Int(200, 200, 200);
 
+
+    [SerializeField][HideInInspector] public bool sdf = false;
+    [SerializeField][HideInInspector] public float minVal = -0.1f;
+    [SerializeField][HideInInspector] public Vector3Int numGridSdf = new Vector3Int(200, 200, 200);
+    [SerializeField][HideInInspector] public Vector3 minRegionSdf = new Vector3(-0.5f, -0.5f, -0.5f);
+    [SerializeField][HideInInspector] public Vector3 maxRegionSdf = new Vector3(0.5f, 0.5f, 0.5f);
+
     float[] points;
+    float[] sdfdata;
     int[] indices;
     ParticleSystem emitter;
     bool isWorking = false;
@@ -135,10 +145,10 @@ unsafe public class Preprocessor : MonoBehaviour
 
         makeInstance(width, height, numCamera);
         setIntrinsics(RealsenseController.instance.intrinsicsDepth, numCamera, true);
+        isWorking = true;
         SetParameter();
 
-        isWorking = true;
-
+        
         if (async)
         {
             stopThread = false;
@@ -212,6 +222,7 @@ unsafe public class Preprocessor : MonoBehaviour
 
     unsafe public void SetParameter()
     {
+        if (isWorking == false) return;
         getMatrix();
         setCamTransMat(matrix, numCamera, true);
 
@@ -229,6 +240,7 @@ unsafe public class Preprocessor : MonoBehaviour
         }
         setBoxRegion(minReg, maxReg, truncate);
 
+
         float[] paramHSV = new float[4];
         paramHSV[0] = HSVW.H; paramHSV[1] = HSVW.S; paramHSV[2] = HSVW.V; paramHSV[3] = HSVW.width;
         setParamHSV(paramHSV, colorTrim);
@@ -242,6 +254,20 @@ unsafe public class Preprocessor : MonoBehaviour
         setSizeWindowNormal(sizeWindow);
 
         setCompression(compressPoints);
+
+        if (unityCoordinate)
+        {
+            minReg[0] = minRegionSdf.x; minReg[1] = minRegionSdf.y; minReg[2] = minRegionSdf.z;
+            maxReg[0] = maxRegionSdf.x; maxReg[1] = maxRegionSdf.y; maxReg[2] = maxRegionSdf.z;
+        }
+        else
+        {
+            minReg[0] = -maxRegionSdf.x / scaleUnity; minReg[1] = minRegionSdf.y / scaleUnity; minReg[2] = minRegionSdf.z / scaleUnity;
+            maxReg[0] = -minRegionSdf.x / scaleUnity; maxReg[1] = maxRegionSdf.y / scaleUnity; maxReg[2] = maxRegionSdf.z / scaleUnity;
+        }
+        nGrid[0] = numGridSdf.x; nGrid[1] = numGridSdf.y; nGrid[2] = numGridSdf.z;
+        setSdf(minReg, maxReg, nGrid, minVal, sdf);
+        sdfdata = new float[numGridSdf.x * numGridSdf.y * numGridSdf.z];
     }
 
     unsafe private void FixedUpdate()
@@ -289,6 +315,13 @@ unsafe public class Preprocessor : MonoBehaviour
     //    _points = points;
     //    return num;
     //}
+
+    public int getSdfData(ref float[] _sdfdata)
+    {
+        int num = getSdf(sdfdata);
+        _sdfdata = sdfdata;
+        return num;
+    }
 
     public int Process()
     {
@@ -413,7 +446,7 @@ unsafe public class Preprocessor : MonoBehaviour
     {
         if (async)
         {
-            UnityEngine.Debug.Log("getPointerValisity() only works with Sync mode");
+            UnityEngine.Debug.Log("getPointerValidity() only works with Sync mode");
             return null;
         }
         else
@@ -424,9 +457,21 @@ unsafe public class Preprocessor : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow;
-        var min = new Vector3(minRegion.x, minRegion.y, minRegion.z);
-        var max = new Vector3(maxRegion.x, maxRegion.y, maxRegion.z);
-        Gizmos.DrawWireCube((min + max) / 2.0f, max - min);
+        if (truncate)
+        {
+            Gizmos.color = Color.yellow;
+            var min = new Vector3(minRegion.x, minRegion.y, minRegion.z);
+            var max = new Vector3(maxRegion.x, maxRegion.y, maxRegion.z);
+            Gizmos.DrawWireCube((min + max) / 2.0f, max - min);
+        }
+
+
+        if (sdf)
+        {
+            Gizmos.color = Color.magenta;
+            var minsdf = new Vector3(minRegionSdf.x, minRegionSdf.y, minRegionSdf.z);
+            var maxsdf = new Vector3(maxRegionSdf.x, maxRegionSdf.y, maxRegionSdf.z);
+            Gizmos.DrawWireCube((minsdf + maxsdf) / 2.0f, maxsdf - minsdf);
+        }
     }
 }

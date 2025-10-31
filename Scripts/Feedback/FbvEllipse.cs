@@ -127,7 +127,7 @@ public class FbvEllipse : HaptoFeedbackAUTD
 
             ellipse.amp = Mathf.Sqrt(force.magnitude * ratioAmpFeedback);
             ellipses.Add(ellipse);
-            Debug.DrawLine(ellipse.center, ellipse.center + vecC);
+            //Debug.DrawLine(ellipse.center, ellipse.center + vecC);
 
             //Debug.DrawLine(ellipse.center, ellipse.center + force * 10, Color.green);
             //Debug.DrawLine(ellipse.center, ellipse.center + ellipse.axisC, Color.green);

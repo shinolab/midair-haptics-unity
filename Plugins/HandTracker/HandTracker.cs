@@ -83,6 +83,7 @@ unsafe public class HandTracker: MonoBehaviour
     [SerializeField][HideInInspector] public int numJoint = 0;
     [SerializeField][HideInInspector] public int degFreeJoint = 0;
     [SerializeField][HideInInspector] public int degElemJoint = 0;
+    [SerializeField][HideInInspector] public int numPoint = 0;
     private Vector3[] vlist;
     private Vector3[] vlistPredicted;
     bool instanced = false;
@@ -434,6 +435,12 @@ unsafe public class HandTracker: MonoBehaviour
         {
 
         }
+    }
+
+    public int GetPoints()
+    {
+        numPoint = getPointSampled(points);
+        return numPoint;
     }
 
     public void VisualizePoint()

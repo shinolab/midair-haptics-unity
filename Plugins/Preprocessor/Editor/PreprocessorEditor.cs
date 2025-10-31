@@ -7,7 +7,7 @@ using UnityEditor;
 
 public class PreprocessorEditor : Editor
 {
-    private bool foldTrim, foldColor, foldErode, foldSample;
+    private bool foldTrim, foldColor, foldErode, foldSample, foldSdf;
 
     public override void OnInspectorGUI()
     {
@@ -62,6 +62,21 @@ public class PreprocessorEditor : Editor
         {
             EditorGUI.indentLevel++;
             EditorGUILayout.PropertyField(serializedObject.FindProperty("numGrid"));
+            EditorGUI.indentLevel--;
+        }
+
+
+        EditorGUILayout.BeginHorizontal();
+        foldSdf = EditorGUILayout.Foldout(foldSdf, "SDF");
+        serializedObject.FindProperty("sdf").boolValue = EditorGUILayout.ToggleLeft("", serializedObject.FindProperty("sdf").boolValue);
+        EditorGUILayout.EndHorizontal();
+        if (foldSdf)
+        {
+            EditorGUI.indentLevel++;
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("minVal"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("numGridSdf"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("minRegionSdf"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("maxRegionSdf"));
             EditorGUI.indentLevel--;
         }
 

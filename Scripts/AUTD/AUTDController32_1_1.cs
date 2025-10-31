@@ -215,6 +215,7 @@ public class AUTDController32_1_1 : AUTDController
                     {
                         Intensity = (byte)(amplitude * 0xFF),
                         Offset = (byte)(offset * 0xFF),
+                        Clamp = true
                     });
             //_autd?.Send(m);
             _autd?.Sender(new SenderOption { Timeout = Duration.FromMillis(0) }).Send(m);
