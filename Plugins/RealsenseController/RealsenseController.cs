@@ -22,10 +22,12 @@ unsafe public class RealsenseController : MonoBehaviour
     [DllImport("dll_realsense")] unsafe protected static extern void startCapturing();
     [DllImport("dll_realsense")] unsafe protected static extern void close();
     [DllImport("dll_realsense")] unsafe protected static extern int getNumDevice();
-    [DllImport("dll_realsense")] unsafe protected static extern void getFrame(ref IntPtr depth, ref IntPtr color, ref IntPtr leftIr, ref IntPtr leftColor, bool waitUpdate);
+    //[DllImport("dll_realsense")] unsafe protected static extern void getFrame(ref IntPtr depth, ref IntPtr color, ref IntPtr leftIr, ref IntPtr leftColor, bool waitUpdate);
+    [DllImport("dll_realsense")] unsafe protected static extern void getFrame(ushort** depth, byte** color, byte** leftIr, byte** leftColor, bool waitUpdate);
 
     //[DllImport("dll_realsense")] unsafe public static extern void getFrameTest(ushort[] depth, byte[] color, byte[] leftIr, byte[] leftColor, bool waitUpdate);
-    [DllImport("dll_realsense")] unsafe protected static extern void getIntrinsicsDepth(ref IntPtr intrinsics);
+    //[DllImport("dll_realsense")] unsafe protected static extern void getIntrinsicsDepth(ref IntPtr intrinsics);
+    [DllImport("dll_realsense")] unsafe protected static extern void getIntrinsicsDepth(float** intrinsics);
 
     public delegate void DebugLogDelegate(string str);
     DebugLogDelegate debugLogFunc = msg => Debug.Log(msg);
@@ -44,11 +46,11 @@ unsafe public class RealsenseController : MonoBehaviour
     [System.NonSerialized] public byte*[] leftColor;
     [System.NonSerialized] public float*[] intrinsicsDepth;
     [System.NonSerialized] public long[] serialNumbers;
-    IntPtr[] depthUM;
-    IntPtr[] colorUM;
-    IntPtr[] leftIrUM;
-    IntPtr[] leftColorUM;
-    IntPtr[] intrinsicsDepthUM;
+    //IntPtr[] depthUM;
+    //IntPtr[] colorUM;
+    //IntPtr[] leftIrUM;
+    //IntPtr[] leftColorUM;
+    //IntPtr[] intrinsicsDepthUM;
     //IntPtr[] serialNumbersUM;
 
     [System.NonSerialized] public int numRealsense = 0;
@@ -107,10 +109,14 @@ unsafe public class RealsenseController : MonoBehaviour
 
     public void getIntrinsics()
     {
-        getIntrinsicsDepth(ref intrinsicsDepthUM[0]);
-        for (int i = 0; i < numRealsense; i++)
+        //getIntrinsicsDepth(ref intrinsicsDepthUM[0]);
+        //for (int i = 0; i < numRealsense; i++)
+        //{
+        //    intrinsicsDepth[i] = (float*)intrinsicsDepthUM[i];
+        //}
+        fixed (float** pIntrinsicsDepth = intrinsicsDepth)
         {
-            intrinsicsDepth[i] = (float*)intrinsicsDepthUM[i];
+            getIntrinsicsDepth(pIntrinsicsDepth);
         }
 
         for (int i = 0; i < numRealsense; i++)
@@ -128,23 +134,31 @@ unsafe public class RealsenseController : MonoBehaviour
         leftColor = new byte*[numRealsense];
         intrinsicsDepth = new float*[numRealsense];
         serialNumbers = new long[numRealsense];
-        depthUM = new IntPtr[numRealsense];
-        colorUM = new IntPtr[numRealsense];
-        leftIrUM = new IntPtr[numRealsense];
-        leftColorUM = new IntPtr[numRealsense];
-        intrinsicsDepthUM = new IntPtr[numRealsense];
+        //depthUM = new IntPtr[numRealsense];
+        //colorUM = new IntPtr[numRealsense];
+        //leftIrUM = new IntPtr[numRealsense];
+        //leftColorUM = new IntPtr[numRealsense];
+        //intrinsicsDepthUM = new IntPtr[numRealsense];
         //serialNumbersUM = new IntPtr[numRealsense];
     }
 
     unsafe public void GetFrame(bool waitUpdate)
     {
-        getFrame(ref depthUM[0], ref colorUM[0], ref leftIrUM[0], ref leftColorUM[0], waitUpdate);
-        for (int i = 0; i < numRealsense; i++)
+        //getFrame(ref depthUM[0], ref colorUM[0], ref leftIrUM[0], ref leftColorUM[0], waitUpdate);
+        //for (int i = 0; i < numRealsense; i++)
+        //{
+        //    depth[i] = (ushort*)depthUM[i];
+        //    color[i] = (byte*)colorUM[i];
+        //    leftIr[i] = (byte*)leftIrUM[i];
+        //    leftColor[i] = (byte*)leftColorUM[i];
+        //}
+
+        fixed (ushort** pDepth = depth)
+        fixed (byte** pColor = color)
+        fixed (byte** pIr = leftIr)
+        fixed (byte** pLeftColor = leftColor)
         {
-            depth[i] = (ushort*)depthUM[i];
-            color[i] = (byte*)colorUM[i];
-            leftIr[i] = (byte*)leftIrUM[i];
-            leftColor[i] = (byte*)leftColorUM[i];
+            getFrame(pDepth, pColor, pIr, pLeftColor, waitUpdate);
         }
     }
 

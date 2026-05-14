@@ -243,6 +243,9 @@ public class HaptoController : CollisionDetector
             numPoint = preprocessor.getProcessedPoints(ref point);
         if (numPoint == 0) point = pointBuffer;
 
+        if (proxy.Count > 0)
+            numPoint = SetPointsFromProxy(point, numPoint);
+
         if (handTracker != null)
         numPoint = SetPointsFromHandTracker(point, numPoint);
 
@@ -286,6 +289,7 @@ public class HaptoController : CollisionDetector
             getCentroid(hapt.id, hapt.centroids);
             getCentroidNear(hapt.id, hapt.centroidsNear);
             getSumForce(hapt.id, hapt.sumForce);
+            getMeanForce(hapt.id, hapt.meanForce);
             //getBindingBox(hapt.id, hapt.bindingBox);
             //UnityEngine.Debug.DrawLine(new Vector3(hapt.bindingBox[0], hapt.bindingBox[1], hapt.bindingBox[2]), new Vector3(hapt.bindingBox[0], hapt.bindingBox[1], hapt.bindingBox[5]));
             //UnityEngine.Debug.DrawLine(new Vector3(hapt.bindingBox[0], hapt.bindingBox[1], hapt.bindingBox[2]), new Vector3(hapt.bindingBox[3], hapt.bindingBox[1], hapt.bindingBox[2]));
@@ -295,7 +299,6 @@ public class HaptoController : CollisionDetector
             if (visualizeFaceTouched)
             {
                 getDirection(hapt.id, hapt.directions);
-                getMeanForce(hapt.id, hapt.meanForce);
                 getIndexFace(hapt.id, hapt.indexFaces);
                 getTouchDirection(hapt.id, hapt.touchDirections);
 

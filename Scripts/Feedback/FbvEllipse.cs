@@ -16,6 +16,7 @@ public class FbvEllipse : HaptoFeedbackAUTD
 
     public float ratioAmpFeedback = 2f;
     public float ratioSizeEllipse = 1.5f;
+    public bool useMeanForce = false;
 
     public bool nearestNeighbor = false;
     protected List<KDTree.Tree> trees = new List<KDTree.Tree>();
@@ -112,7 +113,11 @@ public class FbvEllipse : HaptoFeedbackAUTD
 
 
             Ellipse ellipse;
-            var force = new Vector3(hapt.sumForce[3 * icluster], hapt.sumForce[3 * icluster + 1], hapt.sumForce[3 * icluster + 2]);
+            Vector3 force;
+            if (useMeanForce)
+                force  = new Vector3(hapt.meanForce[3 * icluster], hapt.meanForce[3 * icluster + 1], hapt.meanForce[3 * icluster + 2]);
+            else
+                force = new Vector3(hapt.sumForce[3 * icluster], hapt.sumForce[3 * icluster + 1], hapt.sumForce[3 * icluster + 2]);
 
             ellipse.center = new Vector3(xmean[0], xmean[1], xmean[2]);// * scaleUnity;
             ellipse.axisA = vecA;

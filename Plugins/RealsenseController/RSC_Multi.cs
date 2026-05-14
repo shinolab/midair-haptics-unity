@@ -1,9 +1,5 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using System.IO;
 
 unsafe public class RSC_Multi : RealsenseController
@@ -111,6 +107,7 @@ unsafe public class RSC_Multi : RealsenseController
         {
             List<string> fileNames = new List<string>();
             string fullPath = System.IO.Path.GetFullPath(Application.streamingAssetsPath + "/" + directoryPath);
+            System.IO.Directory.CreateDirectory(fullPath);
             string[] fs = System.IO.Directory.GetFiles(fullPath, "*");
             foreach (var s in fs)
             {
@@ -122,30 +119,29 @@ unsafe public class RSC_Multi : RealsenseController
             {
                 var serial = serials[idev];
                 int i = fileNames.IndexOf(serial);
-                if (i >= 0)
+                string filePath = i >= 0 ? fs[i] : System.IO.Path.Combine(fullPath, serial + ".txt");
+
+                Matrix4x4 mat = devices[idev].transform.localToWorldMatrix;
+                mat[0, 1] = -mat[0, 1];
+                mat[0, 2] = -mat[0, 2];
+                mat[0, 3] = -mat[0, 3];
+                mat[0, 3] /= scaleUnity;
+                mat[1, 3] /= scaleUnity;
+                mat[2, 3] /= scaleUnity;
+                mat[1, 0] = -mat[1, 0];
+                mat[2, 0] = -mat[2, 0];
+                mat[3, 0] = -mat[3, 0];
+
+                StreamWriter sr = new StreamWriter(filePath);
+
+                for (int r = 0; r < 4; r++)
                 {
-                    Matrix4x4 mat = devices[idev].transform.localToWorldMatrix;
-                    mat[0, 1] = -mat[0, 1];
-                    mat[0, 2] = -mat[0, 2];
-                    mat[0, 3] = -mat[0, 3];
-                    mat[0, 3] /= scaleUnity;
-                    mat[1, 3] /= scaleUnity;
-                    mat[2, 3] /= scaleUnity;
-                    mat[1, 0] = -mat[1, 0];
-                    mat[2, 0] = -mat[2, 0];
-                    mat[3, 0] = -mat[3, 0];
-
-                    StreamWriter sr = new StreamWriter(fs[i]);
-
-                    for (int r = 0; r < 4; r++)
+                    for (int c = 0; c < 4; c++)
                     {
-                        for (int c = 0; c < 4; c++)
-                        {
-                            sr.WriteLine(mat[r, c].ToString("F6"));
-                        }
+                        sr.WriteLine(mat[r, c].ToString("F6"));
                     }
-                    sr.Close();
                 }
+                sr.Close();
             }
         }
 

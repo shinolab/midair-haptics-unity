@@ -21,7 +21,7 @@ unsafe public class HandTracker: MonoBehaviour
     [DllImport("dll_handTracking")] unsafe protected static extern void makeInstancePrediction(bool _printTime, int numPoint,
      float[] initPos, float[] initRot, float[] _minRegion, float[] _maxRegion, int[] _numGrid, int _numPointStart, int _numPointEnd,
          int iaxis, bool fromMax, float ratioCut, bool prediction);
-    [DllImport("dll_handTracking")] unsafe protected static extern int track(float* pointD, float* normalD, bool* validityD, bool _prediction);
+    [DllImport("dll_handTracking")] unsafe protected static extern int track(float* pointD, float* normalD, bool* validityD, int numItr, bool onlyPose, bool _prediction);
     [DllImport("dll_handTracking")] unsafe protected static extern void getVertex(float[] vertices);
     [DllImport("dll_handTracking")] unsafe protected static extern void getVertexPredicted(float[] vertices);
     [DllImport("dll_handTracking")] unsafe public static extern void getVertexHR(float[] vertices);
@@ -51,6 +51,8 @@ unsafe public class HandTracker: MonoBehaviour
     public bool autoUpdate = false;
     public bool updateMesh = true;
     public bool visualizePoint = true;
+    public int numItr = 8;
+    public bool onlyPose = false;
     public bool prediction = false;
     public float delay = 70;
     public float scaleUnity = 10f;
@@ -86,6 +88,7 @@ unsafe public class HandTracker: MonoBehaviour
     [SerializeField][HideInInspector] public int numPoint = 0;
     private Vector3[] vlist;
     private Vector3[] vlistPredicted;
+    private Vector3[] pointPositions;
     bool instanced = false;
     float[] points;
     MeshBinderBone meshBinder = null;
@@ -94,6 +97,7 @@ unsafe public class HandTracker: MonoBehaviour
     MeshRenderer meshRendererPredicted = null;
     [SerializeField][HideInInspector] public int mode = 0;
     float[] buf = new float[12];
+    public int PointPositionCount => numPoint;
 
     public class Coeffs
     {
@@ -443,6 +447,35 @@ unsafe public class HandTracker: MonoBehaviour
         return numPoint;
     }
 
+    public int GetPoints(float[] outPoints)
+    {
+        numPoint = getPointSampled(points);
+        outPoints = points;
+        return numPoint;
+    }
+
+    public Vector3[] GetPointPositions()
+    {
+        if (points == null)
+        {
+            numPoint = 0;
+            return null;
+        }
+
+        numPoint = getPointSampled(points);
+        if (pointPositions == null || pointPositions.Length < numPoint)
+        {
+            pointPositions = new Vector3[numPoint];
+        }
+
+        for (int i = 0; i < numPoint; i++)
+        {
+            pointPositions[i] = new Vector3(-points[3 * i], points[3 * i + 1], points[3 * i + 2]) * scaleUnity;
+        }
+
+        return pointPositions;
+    }
+
     public void VisualizePoint()
     {
         //var stopwatch = new Stopwatch();
@@ -482,7 +515,7 @@ unsafe public class HandTracker: MonoBehaviour
     {
         if (preprocessor.Process() < 0) return -1;
         if (prediction) setDelay(delay);
-        mode = track(preprocessor.getPointerPointGlobal(), preprocessor.getPointerNormal(), preprocessor.getPointerValidity(), prediction);
+        mode = track(preprocessor.getPointerPointGlobal(), preprocessor.getPointerNormal(), preprocessor.getPointerValidity(), numItr, onlyPose, prediction);
         getVertex(vertex);
         if (prediction)
             getVertexPredicted(vertexPredicted);

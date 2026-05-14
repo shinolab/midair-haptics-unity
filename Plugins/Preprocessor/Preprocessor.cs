@@ -366,12 +366,24 @@ unsafe public class Preprocessor : MonoBehaviour
             }
 
             emitter.SetParticles(particle, num);
-            //UnityEngine.Debug.Log(num.ToString() + ": " + points[0].ToString() + ", " + points[1].ToString() + ", " + points[2].ToString());
-
-            //UnityEngine.Debug.Log("Visualize: " + (stopwatch.ElapsedTicks - elapsedTicks) * (1000.0 / Stopwatch.Frequency) + " ms");
-            //elapsedTicks = stopwatch.ElapsedTicks;
         }
     }
+
+    public void VisualizePoints(float[] _points, int num, Color color)
+    {
+        ParticleSystem.Particle[] particle = new ParticleSystem.Particle[num];
+        emitter.Clear();
+        emitter.Emit(num);
+        emitter.GetParticles(particle);
+        for (int i = 0; i < num; i++)
+        {
+            particle[i].position = new Vector3(points[3 * i], points[3 * i + 1], points[3 * i + 2]);
+            particle[i].startColor = color;
+        }
+
+        emitter.SetParticles(particle, num);
+    }
+
 
 #if UNITY_EDITOR
     void OnValidate()

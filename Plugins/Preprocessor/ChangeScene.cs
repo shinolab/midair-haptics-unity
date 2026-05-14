@@ -18,6 +18,10 @@ public class ChangeScene : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            StartCoroutine(Change(0));
+        }
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             StartCoroutine(Change(1));

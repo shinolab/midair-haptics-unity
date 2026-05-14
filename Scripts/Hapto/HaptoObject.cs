@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Mathematics;
 using UnityEngine;
 
 
@@ -8,7 +9,8 @@ public class HaptoObject : MonoBehaviour
 {
     public Rigidbody? rigidbody = null;
     public float ratioForceToRigidbody = 1.0f;
-    public Vector3 coeffForce = new Vector3(1, 1, 1);
+    public Vector3 coeffForcePlus = new Vector3(1, 1, 1);
+    public Vector3 coeffForceMinus = new Vector3(1, 1, 1);
 
     public bool detection = true;
     public float radiusBound = 0.45f;
@@ -27,6 +29,7 @@ public class HaptoObject : MonoBehaviour
     public float coeffFingerToBone = 1f;
     public float coeffKBonePos = 0f;
     public float coeffKBoneRot = 0.1f;
+    public float weightPower = 1f;
     float ratioKinematic = 0f;
     float dratioKinematic = 0.05f;
 
@@ -201,10 +204,19 @@ public class HaptoObject : MonoBehaviour
         vertexToBone.Clear();
         for (int i = 0; i < numVertex; i++)
         {
-            index[0] = weights[i].boneIndex0; weight[0] = weights[i].weight0;
-            index[1] = weights[i].boneIndex1; weight[1] = weights[i].weight1;
-            index[2] = weights[i].boneIndex2; weight[2] = weights[i].weight2;
-            index[3] = weights[i].boneIndex3; weight[3] = weights[i].weight3;
+            float[] ws = {
+                Mathf.Pow(weights[i].weight0, weightPower),
+                Mathf.Pow(weights[i].weight1, weightPower),
+                Mathf.Pow(weights[i].weight2, weightPower),
+                Mathf.Pow(weights[i].weight3, weightPower)
+            };
+            float sumW = ws[0] + ws[1] + ws[2] + ws[3];
+            if (sumW < 1e-6) sumW = 1e-6f;
+
+            index[0] = weights[i].boneIndex0; weight[0] = ws[0] / sumW;
+            index[1] = weights[i].boneIndex1; weight[1] = ws[1] / sumW;
+            index[2] = weights[i].boneIndex2; weight[2] = ws[2] / sumW;
+            index[3] = weights[i].boneIndex3; weight[3] = ws[3] / sumW;
 
             //Debug.Log("Vertex " + i + ": " + index[0] + " " + weight[0] + ", " + index[1] + " " + weight[1] + ", " + index[2] + " " + weight[2] + ", " + index[3] + " " + weight[3]);
 
@@ -374,14 +386,46 @@ public class HaptoObject : MonoBehaviour
     public void ApplyForceRigid()
     {
         if (rigidbody == null || ratioForceToRigidbody == 0) return;
+        //for (int i = 0; i < numVertex; i++)
+        //{
+        //    if (externalForce[i].magnitude == 0) continue;
+        //    var posP = vertices[i];
+        //    //var force = Vector3.Scale(externalForce[i], coeffForce) * ratioForceToRigidbody;
+        //    var force = externalForce[i] * ratioForceToRigidbody;
+        //    for (int j = 0; j < 3; j++)
+        //    {
+        //        if (force[j] > 0)
+        //            force[j] *= coeffForcePlus[j];
+        //        else
+        //            force[j] *= coeffForceMinus[j];
+        //    }
+        //    rigidbody.AddForceAtPosition(force, posP);
+
+        //}
+
+        Vector3 totalForce = Vector3.zero;
+        Vector3 totalTorque = Vector3.zero;
+        Vector3 com = rigidbody.worldCenterOfMass;
+
         for (int i = 0; i < numVertex; i++)
         {
-            if (externalForce[i].magnitude == 0) continue;
-            var posP = vertices[i];
-            var force = Vector3.Scale(externalForce[i], coeffForce) * ratioForceToRigidbody;
-            rigidbody.AddForceAtPosition(force, posP);
+            Vector3 f = externalForce[i] * ratioForceToRigidbody;
+            Vector3 posP = vertices[i]; 
+            totalForce += f;
 
+            Vector3 r = posP - com;
+            totalTorque += Vector3.Cross(r, f);
         }
+
+        for (int j = 0; j < 3; j++)
+        {
+            if (totalForce[j] > 0)
+                totalForce[j] *= coeffForcePlus[j];
+            else
+                totalForce[j] *= coeffForceMinus[j];
+        }
+        rigidbody.AddForce(totalForce, ForceMode.Force); 
+        rigidbody.AddTorque(totalTorque, ForceMode.Force);
     }
 
     public void SetTransformedVertices()
