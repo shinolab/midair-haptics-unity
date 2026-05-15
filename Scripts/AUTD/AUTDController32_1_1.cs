@@ -96,13 +96,18 @@ public class AUTDController32_1_1 : AUTDController
         if (!on) return;
 
         List<AUTD3> listAutd = new List<AUTD3>();
+        List<int> registeredAutdIds = new List<int>();
         foreach (var obj in FindObjectsOfType<AUTD3Device>(false).OrderBy(obj => obj.ID))
         {
             listAutd.Add(new AUTD3(obj.transform.position / scaleUnity, obj.transform.rotation));
+            registeredAutdIds.Add(obj.ID);
+            Debug.Log("AUTD3 ID: " + obj.ID + "  Position: " + obj.transform.position + "  Rotation: " + obj.transform.rotation);
             if (!visualizeDevices)
                 obj.transform.GetChild(0).GetComponent<MeshRenderer>().enabled = false;
 
         }
+
+        Debug.Log($"AUTDController32_1_1 registering AUTDs. count={listAutd.Count}, AUTD3Device.ID=[{string.Join(", ", registeredAutdIds)}]");
 
         OpenAUTD(listAutd);
 
