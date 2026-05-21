@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15dcd65b11e0d2542a1b378e93b91118, type: 3}
   m_Name: SRD20
   m_EditorClassIdentifier: 
-  position: {x: 0.8560007, y: -0.13200021, z: -1.8680022}
-  rotation: {x: 0, y: 0.9205049, z: 0.3907311, w: 0}
+  position: {x: 0.86200064, y: 0.20000005, z: -1.8040007}
+  rotation: {x: -0.00000001749956, y: -0.91636527, z: -0.40034324, w: 0.000000040055596}
   scale: {x: 10, y: 10, z: 10}
